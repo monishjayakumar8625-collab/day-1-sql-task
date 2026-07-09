@@ -1,0 +1,35 @@
+create table customers(customer_id int primary key auto_increment ,customer_name varchar(50) , order_id int );
+insert into customers(customer_name,order_id) values ('JUU' , 101),
+                                                     ('ASHIF',102),
+                                                     ('MONU',101),
+                                                     ('KISHAN',103),
+                                                     ('LINX',103),
+													 ('STR' , 102),
+                                                     ('ARUN', 104);
+
+alter table customers add constraint fk_order_id foreign key (order_id)	references orderss(order_id);										
+select * from customers;
+
+-- inner join 
+select * from customers join orderss where customers.order_id = orderss.order_id;
+select c1.customer_id ,c1.customer_name as customer_name , o1.order_name
+								from customers  c1
+                                inner join orderss  o1
+                                on c1.order_id = o1.order_id;
+                                
+-- left outer join 
+select c1.customer_id , c1.customer_name , o1.order_name 
+				from customers c1
+				left join orderss o1
+                on c1.order_id = o1.order_id
+
+-- order table 
+create table orderss (order_id int primary key , orders varchar(30));
+alter table orderss rename column orders to order_name; 
+insert into orderss( order_id , order_name ) values (101 , 'COMPUTER'),
+													(102,'SPEAKER'),
+                                                    (103,'PHONE');
+												
+                                                    
+                                                 
+ select * from orderss                                                   
