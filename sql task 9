@@ -1,0 +1,28 @@
+create table sstudents(stud_id int primary key auto_increment , stud_name varchar(50) , dept_id int);
+insert into sstudents(stud_name , dept_id) values ('JUU' , 101) , 
+												                          ('ASHIF' , 101) ,
+                                                  ('MONISHWAR' ,102),
+                                                  ('KISHAN' , 102),
+                                                  ('LINX' , 101);
+alter table sstudents add constraint fk_studdept_id foreign key (dept_id) references department(dept_id);
+
+-- right join 
+select s1.stud_id , s1.stud_name , d1.dept_id 
+            from sstudents s1
+            right join department d1
+            on s1.dept_id = d1.dept_id;
+
+-- full outer join 
+select s1.stud_id , s1.stud_name , d1.dept_id 
+            from sstudents s1
+            left join department d1
+            on s1.dept_id = d1.dept_id
+UNION
+select s1.stud_id , s1.stud_name , d1.dept_id 
+            from sstudents s1
+            right join department d1
+            on s1.dept_id = d1.dept_id;
+
+
+
+
