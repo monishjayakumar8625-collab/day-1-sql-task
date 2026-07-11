@@ -1,0 +1,59 @@
+-- without 1NF
+create table student_course(stud_id int primary key , stud_name varchar(50) ,  course_name varchar(50));
+insert into student_course (stud_id , stud_name , course_name) values (1,'JUU','AIML,CSE,SQL'),
+																	  (2,'ASHIF','CSE,PYTON,JAVA'),
+                                                                      (3,'MONU','REACT,JAVA,AIML');
+select * from student_course;
+
+-- with 1NF
+create table students_course_1NF(stud_id int , stud_name varchar(50) ,  course_name varchar(50));
+insert into students_course_1NF (stud_id , stud_name , course_name) values (1,'JUU','AIML'),
+																	  (1,'JUU','CSE'),
+                                                                      (1,'JUU','SQL'),
+																	  (2,'ASHIF','CSE'),
+                                                                      (2,'ASHIF','PYTON'),
+                                                                      (2,'ASHIF','JAVA'),
+                                                                      (3,'MONU','REACT'),
+                                                                      (3,'MONU','JAVA');
+
+select * from students_course_1NF;
+ 
+-- without 2NF
+create table students_without2NF(stud_id int , stud_name varchar(50) ,course_id int,  course_name varchar(50),instructor varchar(50));
+insert into students_without2NF(stud_id,stud_name,course_id,course_name,instructor) values
+											(1,'JUU',101,'AIML','STR'),
+                                            (1,'JUU',102,'SQL','VIJAY'),
+                                            (2,'ASH',101,'AIML','STR'),
+                                            (2,'ASH',103,'PYTHON','KAMAL'),
+                                            (3,'MONU',103,'PYTHON','KAMAL');
+
+select * from students_without2NF;
+
+-- with 2NF
+create table students_with2NF(stud_id int , stud_name varchar(50));
+insert into students_with2NF values(1,'JUU'),
+                                   (2,'ASH'),
+                                   (3,'MONU');
+alter table students_with2NF modify column stud_id int primary key;
+select * from students_with2NF;
+
+create table course(course_id int primary key, course_name varchar(50) , instructor varchar(50));
+insert into course values(101,'AIML','STR'),
+                         (102,'SQL','VIJAY'),
+                         (103,'PYTHON','KAMAL');
+select * from course;
+
+
+create table student_course_2NF(stud_id int,
+                               course_id int,
+                               primary key(stud_id , course_id));
+                               
+                               
+alter table student_course_2NF add constraint fk_2nf_id foreign key (stud_id) references  students_with2NF(stud_id);
+alter table student_course_2NF add constraint fk_cnf_id foreign key (course_id) references  course(course_id);
+                               
+insert into student_course_2NF values(1,101),
+                                     (1,102),
+                                     (2,103);
+                                     
+select * from student_course_2NF
