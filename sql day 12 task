@@ -1,0 +1,10 @@
+use practicedb;
+select * from orders where (select count(*) from orders);
+
+use empdb;
+select emp_id,emp_name,department,salary from employees e1 where salary in (select max(salary) from employees e2 group by department
+having e1.department=e2.department); 
+
+
+use productdb;
+select  prdt_id , prdt_name from products p where exists( select prdt_id from orders o where o.prdt_id = p.prdt_id);
