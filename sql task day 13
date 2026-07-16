@@ -1,0 +1,17 @@
+create table sales(sales_id int primary key,
+				   product varchar(100),
+                   amount decimal(10,2));
+                   
+insert into sales(sales_id, product, amount) values 
+(1,'cake',700),
+(2,'cups',150),
+(3,'Vanila syrup',200),
+(4,'birthday cap',75),
+(5,'jim jam',20);
+
+select  sales_id , product ,amount, ROW_NUMBER() over( order by amount desc)  as row_amount from sales;
+select  sales_id , product ,amount, rank() over(  order by amount )  as row_amount from sales;
+
+insert into sales values (6,'cookies',20);
+ 
+ select  sales_id , product ,amount, dense_rank() over( partition by product order by amount )  as row_amount from sales;
