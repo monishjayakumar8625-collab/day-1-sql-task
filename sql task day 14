@@ -1,0 +1,58 @@
+create table sales(id int primary key , prdt_name varchar(50) , amount bigint);
+insert into sales values (1,'cake',700) , 
+                         (2,'ice cream ', 50),
+                         (3,'chocolates' , 10),
+                         (4,'cookie',500),
+                         (5,'brownie',400),
+                         (6,'pastery' ,150),
+                         (7,'wine',3000);
+select * from sales;
+alter table  sales add sales int;   
+update sales set sales = 7 where id in (7);                  
+                         
+SELECT
+    id,
+    prdt_name,
+    amount,
+    sales,
+    SUM(amount) OVER (ORDER BY amount) AS running_total
+FROM sales;
+
+with get_avg_sales as
+( 
+ select id , prdt_name ,amount from sales where sales < (select avg(sales) from sales)
+)select * from get_avg_sales;
+
+use empdb;
+DELIMITER //
+
+CREATE PROCEDURE add_new_employee(
+    IN p_emp_id INT,
+    IN p_emp_name VARCHAR(50),
+    IN p_salary DECIMAL(10,2),
+    IN p_department VARCHAR(20)
+)
+BEGIN
+    INSERT INTO employees(emp_id, emp_name, salary, department)
+    VALUES (15, 'SILAMBARASAN', 100000, 'HR');
+END //
+
+DELIMITER ;
+
+
+call insertemployee(15,'SILAMBARASAN',100000,'HR');
+select * from employees
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateSalary(
+    IN p_id INT,
+    IN p_salary DECIMAL(10,2)
+)
+BEGIN
+    UPDATE employee
+    SET salary = p_salary
+    WHERE id = p_id;
+END //
+
+DELIMITER ;
