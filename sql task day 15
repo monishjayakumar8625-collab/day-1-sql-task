@@ -1,0 +1,103 @@
+-- 1 
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(50),
+    stock INT
+);
+
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    quantity INT,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+INSERT INTO Products VALUES
+(101, 'Laptop', 50),
+(102, 'Mouse', 100),
+(103, 'Keyboard', 75);
+
+delimiter //
+create trigger update_stock
+after insert 
+on orders
+for each row
+begin
+	update products
+    set stock = stock - new.quantity
+	WHERE product_id = NEW.product_id;
+end //
+delimiter ;
+
+
+
+INSERT INTO Orders(product_id, quantity)
+VALUES(101, 5);
+
+SELECT * FROM Products;
+
+-- 2
+create table users(user_id int primary key , 
+				   user_name varchar(50) , 
+                   role varchar(20));
+INSERT INTO users (user_id , user_name, role) VALUES
+(1,'Alice', 'Admin'),
+(2,'Bob', 'Admin'),
+(3,'Charlie', 'User'),
+(4,'David', 'User');
+ 
+ DELIMITER //
+
+CREATE TRIGGER prevent_last_admin_delete
+BEFORE DELETE
+ON users
+FOR EACH ROW
+BEGIN
+    DECLARE admin_count INT;
+
+    -- Check if the user being deleted is an Admin
+    IF OLD.role = 'Admin' THEN
+
+        -- Count the number of Admin users
+        SELECT COUNT(*)
+        INTO admin_count
+        FROM users
+        WHERE role = 'Admin';
+
+        -- Prevent deletion if it is the last Admin
+        IF admin_count = 1 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot delete the last Admin user.';
+        END IF;
+
+    END IF;
+END//
+
+DELIMITER ;
+
+DELETE FROM users
+WHERE user_id = 2;
+
+-- 3
+delimiter //
+create procedure fetch_employees()
+begin
+	select * from employees;
+end //
+
+delimiter ;
+
+call fetch_employees;
+
+-- 4
+drop trigger update_stock;
+drop procedure fetchemployees;
+
+-- 5
+select * from employees where salary > (select avg(salary) from employees);
+
+-- 6 
+select customer_id , customer_name from custromers where customer_id in (select customer_id from orders group by customer_id having count (order_id)>2);
+
+-- 7
+select product_id , product_name , product_price from products where product_price = (select max(product_price) from products);
