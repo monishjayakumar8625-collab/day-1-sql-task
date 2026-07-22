@@ -1,0 +1,126 @@
+-- 1
+delimiter //
+create trigger before_update
+before update 
+on employees
+for each row
+begin 
+	if new.salary < old.salary then 
+    signal sqlstate '45000'
+    set message_text = 'salary reduction is not allowed';
+    end if;
+end  //
+delimiter ;
+
+insert into employees(emp_id,emp_name,salary ,dept) values (104,'Hazel',55000,'Finance');
+select * from employees;
+
+update employees set salary = 40000 where emp_id = 104;
+
+-- 2
+create table employees_archive( emp_id int primary key , emp_name varchar(50) , salary decimal(10,2) , archived_at timestamp default current_timestamp);
+
+delimiter //
+create trigger after_delete
+after delete
+on employees
+for each row
+begin 
+	insert into employees_archive(emp_id,emp_name,salary) values (old.emp_id , old.emp_name , old.salary)  ;
+end //
+delimiter ;
+
+delete from employees where emp_id = 101;
+select * from employees;
+select * from employees_archive;
+
+-- 3
+CREATE TABLE employees_modified (emp_id INT PRIMARY KEY,emp_name VARCHAR(100),salary DECIMAL(10,2),last_modified TIMESTAMP);
+insert into employees_modified values (101,'RAJU',50000,NOW());
+delimiter // 
+create trigger last_modified
+before update
+on employees_modified
+for each row
+begin
+	set new.last_modified = current_timestamp;
+end //
+DELIMITER ;
+
+update employees_modified set salary = 60000 where emp_id = 101;
+select * from employees_modified;
+
+-- 4
+CREATE TABLE employeess(emp_id INT PRIMARY KEY,emp_name VARCHAR(100),salary DECIMAL(10,2),department varchar(10) , phone_no bigint unique );
+set sql_safe_updates = 0;
+
+
+delimiter //
+
+create trigger not_null
+before update 
+on employeess
+for each row 
+begin
+	if new.phone_no is null then 
+	signal sqlstate '45000' 
+    set message_text = "phone_no cannot be in null";
+    end if ;
+end //
+delimiter ;
+
+drop trigger not_null;
+insert into employeess values (3,'JUU',20000,'HR',null);
+update employeess set phone_no = null where emp_id = 2;
+
+-- 5
+DELIMITER //
+
+CREATE TRIGGER check_department_budget
+BEFORE INSERT
+ON employees
+FOR EACH ROW
+BEGIN
+    DECLARE dept_budget DECIMAL(10,2);
+
+    SELECT budget
+    INTO dept_budget
+    FROM departments
+    WHERE dept_id = NEW.dept_id;
+
+    IF NEW.salary > dept_budget THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Salary exceeds department budget';
+    END IF;
+END //
+
+DELIMITER ;
+
+-- 6
+DELIMITER //
+
+CREATE TRIGGER check_salary
+BEFORE INSERT
+ON employees
+FOR EACH ROW
+BEGIN
+    IF NEW.salary < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Salary cannot be negative';
+    END IF;
+END//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER log_employee_insert
+AFTER INSERT
+ON employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO employee_audit (emp_id, action)
+    VALUES (NEW.emp_id, 'INSERT');
+END//
+
+DELIMITER ;
